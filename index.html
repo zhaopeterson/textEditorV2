@@ -125,7 +125,7 @@ $(function(){
       textAlign = "left";
 
   // binding the mouseup event in the text area once the user select the text, wraps it a mark tag    
-  $('p.te-text').on('mouseup', function(){
+  $('p.te-text').on('mouseleave', function(){
     if ($('p.te-text mark').length == 0 || $('p.te-text mark').hasAttr('style')) {
       getSelectText();
     }
