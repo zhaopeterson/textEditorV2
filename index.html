@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Text Editor</title>
+<link rel="stylesheet" type="text/css" href="css/base.css">
+<link rel="stylesheet" type="text/css" href="css/texteditor.css">
+<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <section class="te-editor">
+    <article class="te-text-panel">
+      <p class="te-text">Lorem Ipsum is simply dummy text of the printing and typesetting industry.Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. END</p>
+    </aticle>
+
+
+    <aside class="te-controls">
+      <ul class="te-tabs">
+        <li><a href="#te-controls-text">Text</a></li>
+        <li><a href="#te-controls-arrange">Arrange</a></li>
+      </ul>
+
+      <div id="te-controls-text" class="te-tab-panel">
+        <h2>Font</h2>
+        <div class="te-style-group">
+          <ul class="te-select-wrapper">
+            <li class="te-select-header">Regular
+              <ul class="te-dropdown">
+                <li data-value="LatoHai">Ultra Light</li>
+                <li data-value="LatoLight">Light</li>
+                <li data-value="Lato">Regular</li>
+                <li data-value="LatoBold">Bold</li>
+                <li data-value="LatoBlack">Black</li>
+              </ul>
+            </li>
+          </ul><!--  end of select wrapper  -->
+
+          <input type="number" class="te-font-size" min="6" max="36" value="12"/>
+          <div class="te-buttons-fontstyle">
+            <button data-value="bold">B</button>
+            <button data-value="italic">I</button>
+            <button data-value="underline">U</button>
+          </div>
+          <input type="color" class="te-color-picker"></input>
+        </div> <!-- end of font style section -->
+
+        <h2>Alignment</h2>
+         
+        <div class="te-style-group">
+          <div class="te-buttons-textalign">
+            <button data-value="left"><i class="fa fa-align-left"></i></button>
+            <button data-value="center"><i class="fa fa-align-center"></i></button>
+            <button data-value="right"><i class="fa fa-align-right"></i></button>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="te-controls-arrange" class="te-tab-panel">
+        <h2>Size and Position</h2>
+        <div class="te-style-group" id="te-size-position">
+          <label class="width" for="width">Width
+            <input id="width" type="number" class="width" value="312" min="120" max="996"></input>
+            </label>
+            <label class="position-x" for="position-x">Position X
+              <input id="position-x" type="number" class="position-x" value="0" min="0" max="996"></input>
+            </label>
+            <label class="height" for="height">Height
+              <input id="height" type="number" class="height" value="208" min="120" max="756"></input>
+              </label>
+            <label class="position-y" for="position-y">Position Y
+              <input id="position-y" type="number" class="position-y" value="0" min="0" max="800"></input>
+            </label>
+        </div>
+        <div class="error"></div>
+      </div>
+    </aside>
+  </section>
+
+<script src="js/jquery-1.11.1.js"></script>
+<script>
+
+$(function(){
+  'use strict';
+  // create a tabs plugin
+  var tabPanel = function($li) {
+    var tabDiv = $li.find('a').attr('href');
+    return $(tabDiv);
+  }
+  $.fn.tabs = function() {
+    $.each(this, function(i, ul){
+      var $ul = $([ul]),
+          $activeLi;
+      $.each($ul.children(), function(i, li){
+        var $li = $([li]);
+        if (i==0) {
+          $activeLi = $li;
+          $activeLi.addClass('selected')
+        } else {
+          var $div = tabPanel($li);
+              $div.hide();
+        }
+      }); //each $ul children
+
+      $ul.children().bind("click", function(){
+        tabPanel($activeLi).hide();
+        $activeLi = $([this]);
+        $activeLi.siblings().removeClass('selected')
+        $activeLi.addClass('selected')
+        tabPanel($activeLi).show();
+      })
+    });
+  };
+
+  $('.te-tabs').tabs();
+
+  // select text function
+  // All the font weight are defined in the @font-face using explicit names, to avoid faux bold
+  // set default font-family, style and text-decoration etc.
+
+  var fontWeight = "Lato",
+      fontItalic = "normal",
+      fontUnderline = "none",
+      textAlign = "left";
+
+  // binding the mouseup event in the text area once the user select the text, wraps it a mark tag    
+  $('p.te-text').on('mouseup', function(){
+    if ($('p.te-text mark').length == 0 || $('p.te-text mark').hasAttr('style')) {
+      getSelectText();
+    }
+  })
+
+
+  // chnage font weight
+  $(".te-select-wrapper ul li").on('click', function(){
+    fontWeight = $(this).attr('data-value');
+    //update the list header to mimic the effect of a select box
+    var str = $(this).html()
+    $(".te-select-header").contents().eq(0).wrap("<p />").parent().text(str).contents().unwrap();
+      markToSpan();
+      updateTextStyle('font-family', fontWeight)
+    });
+
+  // change font-size
+  $(".te-font-size").on('change', function(){
+    var fontSize = $(this).val();
+    console.log("the font size has changed: ", fontSize)
+    markToSpan();
+    updateTextStyle("font-size", fontSize + "px");
+  });
+
+  //change font-style
+  $(".te-buttons-fontstyle button").on('click', function(){
+    $(this).toggleClass('selected');
+      var fontStyle = $(this).attr('data-value');
+        markToSpan();
+
+      if (fontStyle == 'bold') {
+        // to prevent faux bold, when the bold button is clicked, only LatoBold is  applied, othrewise the font-weight stayed the same
+        $(this).hasClass('selected') ? updateTextStyle("font-family", 'LatoBold') : 
+                                      updateTextStyle("font-family", fontWeight);
+                     
+        }
+      if (fontStyle == 'italic') {       
+          $(this).hasClass('selected') ? fontStyle = "italic" : fontStyle = "normal"
+          updateTextStyle("font-style", fontStyle)                       
+      }
+      if (fontStyle == 'underline') {       
+          $(this).hasClass('selected') ? fontUnderline = "underline" : fontUnderline = "none"
+          updateTextStyle("text-decoration", fontUnderline)                      
+      }
+  });
+
+  // color change
+  // replace the existing <span> with <mark> 
+  $(".te-color-picker").on('change', function(){
+    var textColor = $(this).val();
+    markToSpan();
+    updateTextStyle('color', textColor)
+  });
+
+  // text align
+  $(".te-buttons-textalign button").on("click", function(){
+    $(this).siblings().removeClass('selected');
+    $(this).toggleClass('selected');
+    $(this).hasClass('selected') ? textAlign = $(this).attr('data-value')
+                                    : textAlign = "left";
+    updateTextAlign('text-align', textAlign);
+  });
+
+  // update the width, height, positionX and positionY of the text
+  $("#te-size-position input").on('change', function(){
+    var spValue = parseInt($(this).val()),
+        textWidth = parseInt($('p.te-text').width()),
+        textHeight = parseInt($('p.te-text')[0].scrollHeight),
+        positionX = parseInt($('#position-x').val()),
+        positionY = parseInt($('#position-y').val()),
+        defaultX = 30,
+        defaultY = 30,
+        newX = 0,
+        newY = 0,
+        errMsg = "";
+    switch($(this).attr("id")) {
+      case "width":
+        if ( spValue < 1056) {
+          spValue + positionX > 1056 ? updateSize("width", (1056 - positionX)) : updateSize("width", spValue);
+        } else {
+          errMsg = "You should select width from 0px - 996px"
+        }
+      break;
+      case "height":
+        if( spValue < 816) {
+          spValue + positionY > 816 ? updateSize("width", (816 - positionY)) : updateSize("height", spValue);
+
+        } else {
+          errMsg = "You should select height from 0px - 816px"
+        }
+      break;
+      case "position-x":
+            newX = spValue + "px";
+            newY = ($('#position-y').val() == 0)? defaultY +"px" : $('#position-y').val();
+                        console.log(positionY)
+            updatePosition(newY, newX);
+            if ((positionX + textWidth) > 1056) {
+              var newTextWidth = 1056 - positionX;
+              updateSize("width", newTextWidth)
+            }
+            var newTextHeight = parseInt($('p.te-text-editor')[0].scrollHeight);
+      break;
+      case "position-y":
+            newY = spValue + "px";
+            newX = positionX == 0 ? defaultX +"px": positionX;
+
+            updatePosition(newY, newX);
+            if ((positionY + textHeight) > 816 ) {
+              var newTextHeight = 816 - positionY;
+              updateSize("height", newTextHeight)
+            }
+      break;
+
+    } //end of switch
+    updateErrorMsg(errMsg)
+  })
+});
+
+function getSelectText() {
+  var highlight, selection, selectedText;
+    if (window.getSelection().isCollapsed == false) {
+      selection = window.getSelection();
+      selection = selection.getRangeAt(0)
+      selectedText = selection.extractContents();
+      var mark = document.createElement("mark");
+      mark.appendChild(selectedText);
+      selection.insertNode(mark);  
+    }
+  }
+
+// helper function see if element (such as the span has attribute)
+$.fn.hasAttr = function(name) {  
+  return this.attr(name) !== undefined;
+};
+
+function markToSpan(){
+  $('.te-text mark').each(function(){
+    if($(this).hasAttr("style")) {
+      $(this).replaceWith(function() {
+        return $('<span/>', {
+          style: this.getAttribute('style'),
+          html: this.innerHTML
+        });
+      });
+    }
+  })
+}
+
+function updateTextStyle(prop, fw) {
+  if(!$("p.te-text mark").hasAttr("style")) {
+    $('p.te-text mark').css(prop, fw).css("background", "transparent");
+  }
+}
+
+function updateTextAlign(prop, fw) {
+  $('p.te-text').css(prop, fw);
+}
+
+function updatePosition(y, x) {
+  $('p.te-text').css({"margin-top": y, "margin-left": x})
+}
+
+function updateErrorMsg(em) {
+  $('div.error').html(em);
+}
+
+
+</script>
+</body>
+</html>

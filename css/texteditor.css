@@ -1,0 +1,313 @@
+html {
+	background: #7b7b7b;/* when zoom in make sure there is a background other wise see gradient bottom */
+}
+body {
+	font: 100% Lato, Helvetica, sans-serif;
+	background: -webkit-linear-gradient(#a7a8aa, #7b7b7b);
+	color: #4d4d4d;
+	font-size: 14px;
+}
+* {
+	box-sizing: border-box;
+}
+:focus {
+	outline: 0;/* rid of Chrome default blue outline */
+}
+.te-editor {
+	width: 100%;
+	min-width: 1416px;/* scroll bar do not appear 1056 + 2 *30 + 300 px */
+	line-height: 1.4;
+	position: relative;
+	padding: 30px 330px 30px 30px;
+	overflow: hidden;
+}
+
+.te-text-panel {
+	max-width: 1056px;
+	min-height: 816px;
+	height: 100%;
+	padding: 0;
+	margin: 0 auto;
+	background: #fff;
+	border: solid 1px transparent;
+}
+
+.te-text-panel p {
+	width: 600px;
+	margin: 30px 0 0 30px;
+	overflow: hidden;
+}
+
+/* reuseable components of text editor controls panel 
+   subfixing it with .te-
+*/
+
+.te-controls {
+	position: fixed;
+	top: 0;
+	right: 0;
+	width: 300px;
+	min-height: 876px;
+	height: 100%;
+	background-color: #fff;
+	border-left: solid 1px #e0e0e0;
+	z-index:100;
+}
+.te-tabs {
+	height: 35px;
+}
+.te-tabs li {
+	width: 149px;
+	text-align: center;
+	line-height: 35px;
+	font-weight: bold;
+	float: left; /* display inline-block generate 4px gutter in between probably more hassel to offset */
+	border-bottom: solid 1px #e0e0e0;
+}
+.te-tabs li:hover {
+	pointer: cursor;
+}
+.te-tabs li a {
+	display: block;
+	width: 100%;
+	height: 100%;
+	color: #bbb;
+	text-decoration: none;
+}
+.te-tabs li a:visited {
+	color: #bbb;
+}
+.te-tabs li a:hover, .te-tabs li.selected a {
+	color: #227ecb;
+}
+
+.te-tabs li:first-child {
+	border-right: solid 1px #e0e0e0;
+}
+
+.te-tab-panel {
+	width: 100%;
+	min-height: 160px;
+	background-color: #f8f8f8;
+}
+.te-tab-panel h2 {
+	font-family: "LatoBold";
+	line-height: 30px;
+	padding: 0 10px;
+}
+.te-style-group {
+	width: 100%;
+	padding: 10px;
+	background: #fff;
+}
+
+.te-select-wrapper {
+	width: 175px;
+	height: auto;
+	margin-bottom: 5px;
+	display: inline-block;
+	position: relative;
+	cursor: pointer;
+}
+
+.te-select-wrapper::after {
+	content: '';
+	display: block; 
+	width: 0; 
+	height: 0;
+	position: absolute;
+	top: 15px;
+	right: 8px;
+	border-top: solid 6px #4d4d4d;
+	border-right: solid 4px transparent;
+	border-left: solid 4px transparent;
+	z-index: 10;
+}
+.te-select-wrapper li {
+	height: 40px;
+	line-height: 40px;
+}
+.te-select-wrapper li {
+	padding-left: 10px;
+}
+/* use background gradient to fake the background color and solve 
+ the 5px margin between selector header and dropdown */
+.te-select-header {
+	background: #e0e0e0;
+	background: -webkit-linear-gradient(top, #e0e0e0 0%,#e0e0e0 87%,#ffffff 87%);
+}
+.te-dropdown {
+	display: none;
+	vertical-align: top;
+	margin-left: -10px;
+	margin-right: 15px;
+	background: #fff;
+	border: solid 1px #e8e8e8;
+	z-index: 100;
+}
+.te-select-wrapper li:hover > ul {
+	position: absolute;
+	width: 160px;
+	display: block;
+}
+.te-select-wrapper li:hover > ul li:hover{
+	display: block;
+	background: #e8e8e8;
+}
+.te-dropdown li[data-value="LatoHai"]{
+	font-family: 'LatoHai';
+}
+
+.te-dropdown li[data-value="LatoLight"]{
+	font-family: 'LatoLight';
+}
+.te-dropdown li[data-value="Lato"]{
+	font-family: 'Lato';
+}
+.te-dropdown li[data-value="LatoBold"]{
+	font-family: 'Lato';
+	font-weight: bold;
+}
+.te-dropdown li[data-value="LatoBlack"]{
+	font-family: 'LatoBlack';
+}
+
+/* rules for font-size selection */
+.te-font-size {
+	width: 90px;
+	height: 30px;
+	float: right;
+}
+
+input[type="number"], input[type="color"]{
+	text-align: center;
+	font-size: 14px;
+	height: 35px;
+	padding: 0;
+	cursor: pointer;
+}
+.te-buttons-fontstyle {
+	width: 176px;
+	height: 35px;
+	display: inline-block;
+}
+button {
+	width: 58px;
+	font-size: 16px;
+	font-family: 'LatoBold';
+	border-radius: 0;
+	border: solid 1px #e0e0e0;
+	padding: 0;
+	background: #f8f8f8;
+	height: 35px;
+	cursor: pointer;
+	color: #4d4d4d;
+}
+button:first-child {
+	border-right: none;
+}
+button:nth-child(2){
+	margin-left: -3px;
+}
+button:nth-child(3){
+	margin-left: -2px;
+}
+button:last-child {
+	border-left: none;
+}
+button[data-value="italic"] {
+	font-family: "LatoBold";
+	font-style: italic;
+}
+button[data-value="underline"] {
+	text-decoration: underline;
+}
+button.selected {
+	background-color: #c6c4c4;
+}
+
+.te-color-picker {
+	height: 32px;
+	float: right;
+}
+
+label {
+	display: inline-block;
+	width: 134px;
+	height: 30px;
+	line-height: 30px;
+	position: relative;
+}
+
+label:nth-child(even) {
+	margin-left: 6px;
+}
+label:nth-child(3n), label:nth-child(4n){
+	margin-top: 15px;
+}
+
+label > input[type="number"] {
+	text-align: left;
+	padding-left: 10px;
+	width: 134px;
+}
+
+input[type=number]::-webkit-inner-spin-button { 
+    -webkit-appearance: none;
+    cursor:pointer;
+    display:block;
+    width:8px;
+    color: #333;
+    text-align:center;
+    position:relative;
+} 
+input[type=number]::-webkit-inner-spin-button { 
+    width: 14px;
+    height: 14px;
+    padding: 4px;
+    position: relative;
+    right: 4px;
+    border-radius: 8px;
+    z-index:5;
+    opacity: 1;  /* this is the key to make sure the inner-spinner-wheel is always show, not only on hover */
+
+}
+
+input[type=number]::-webkit-inner-spin-button::before {
+	content: '';
+	display: block; 
+	width: 0; 
+	height: 0;
+	position: absolute;
+	top: 3px;
+	right: 8px;
+	border-bottom: solid 6px #4d4d4d;
+	border-right: solid 4px transparent;
+	border-left: solid 4px transparent;
+	z-index: 10;
+}
+
+input[type=number]::-webkit-inner-spin-button::after {
+	content: '';
+	display: block;
+	width: 0; 
+	height: 0;
+	position: absolute;
+	top: 15px;
+	right: 8px;
+	border-top: solid 6px #4d4d4d;
+	border-right: solid 4px transparent;
+	border-left: solid 4px transparent;
+	z-index: 10;
+}
+
+/* set the mark element background to transparent*/
+mark {
+	background: #b1d7fe;
+}
+.error {
+	background: #fff;
+	padding: 10px;
+	font-size: 10px;
+	color: red;
+}
